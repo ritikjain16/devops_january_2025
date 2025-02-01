@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DOCKER_HUB_USERNAME = "rj16"
-        DOCKER_HUB_PASSWORD = credentials('docker-hub-credentials')
+        DOCKER_HUB_PASSWORD = credentials('docker-hub-credentials') // Add Jenkins credentials for Docker Hub
     }
 
     stages {
@@ -13,19 +13,30 @@ pipeline {
             }
         }
 
-        stage('Build Docker Images') {
+        stage('Set Up Docker Buildx') {
             steps {
-                sh 'docker build -t $DOCKER_HUB_USERNAME/mern-backend ./devops_backend'
-                sh 'docker build -t $DOCKER_HUB_USERNAME/mern-frontend ./devops_frontend'
+                sh 'docker buildx create --use'
+                sh 'docker buildx inspect --bootstrap'
             }
         }
 
-        stage('Push Docker Images to Docker Hub') {
+        stage('Build & Push Backend Image') {
             steps {
-                withDockerRegistry([credentialsId: 'docker-hub-credentials', url: '']) {
-                    sh 'docker push $DOCKER_HUB_USERNAME/mern-backend'
-                    sh 'docker push $DOCKER_HUB_USERNAME/mern-frontend'
-                }
+                sh '''
+                docker login -u $DOCKER_HUB_USERNAME -p $DOCKER_HUB_PASSWORD
+                docker buildx build --platform linux/amd64,linux/arm64 \
+                -t $DOCKER_HUB_USERNAME/mern-backend:latest --push ./devops_backend
+                '''
+            }
+        }
+
+        stage('Build & Push Frontend Image') {
+            steps {
+                sh '''
+                docker login -u $DOCKER_HUB_USERNAME -p $DOCKER_HUB_PASSWORD
+                docker buildx build --platform linux/amd64,linux/arm64 \
+                -t $DOCKER_HUB_USERNAME/mern-frontend:latest --push ./devops_frontend
+                '''
             }
         }
 
