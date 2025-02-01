@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DOCKER_HUB_USERNAME = "rj1608"
-        DOCKER_HUB_PASSWORD = credentials('docker-hub-credentials') // Add Jenkins credentials for Docker Hub
+        DOCKER_HUB_PASSWORD = "00@#Doraemon000" // Add Jenkins credentials for Docker Hub
     }
 
     stages {
