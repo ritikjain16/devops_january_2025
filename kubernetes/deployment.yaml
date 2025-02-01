@@ -29,6 +29,6 @@ spec:
           image: rj16/mern-frontend:latest
           ports:
             - containerPort: 5173
-          env:
-            - name: REACT_APP_API_URL
-              value: "http://backend-service:5000"
+          # env:
+          #   - name: REACT_APP_API_URL
+          #     value: "http://backend-service:5000"
