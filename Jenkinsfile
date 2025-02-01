@@ -23,6 +23,7 @@ pipeline {
         stage('Build & Push Backend Image') {
             steps {
                 sh '''
+                echo $DOCKER_HUB_PASSWORD
                 docker login -u $DOCKER_HUB_USERNAME -p $DOCKER_HUB_PASSWORD
                 docker buildx build --platform linux/amd64,linux/arm64 \
                 -t $DOCKER_HUB_USERNAME/mern-backend:latest --push ./devops_backend
