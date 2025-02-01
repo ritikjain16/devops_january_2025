@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mern-app-devops
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: mern
+  template:
+    metadata:
+      labels:
+        app: mern
+    spec:
+      containers:
+        - name: backend
+          image: rj16/mern-backend:latest
+          ports:
+            - containerPort: 5000
+          env:
+            - name: PORT
+              value: "5000"
+            # - name: MONGODB_URI
+            #   value: "mongodb://mongodb-service:27017/mern"
+            # - name: JWT_SECRET
+            #   value: "your-secret-key"
+
+        - name: frontend
+          image: rj16/mern-frontend:latest
+          ports:
+            - containerPort: 5173
+          # env:
+          #   - name: REACT_APP_API_URL
+          #     value: "http://backend-service:5000"
