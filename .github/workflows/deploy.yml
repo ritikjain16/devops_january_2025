@@ -28,16 +28,16 @@ jobs:
           ls -l
         
           # Write the private key from GitHub Secrets to a temporary file
-          echo "${{ secrets.EC2_PRIVATE_KEY }}" > private-key.pem
+          # echo "${{ secrets.EC2_PRIVATE_KEY }}" > private-key.pem
 
           # Set correct file permissions for the private key
-          chmod 600 private-key.pem
+          # chmod 600 private-key.pem
 
           # Run SCP to copy the frontend files to EC2
-          scp -i private-key.pem -r dist ubuntu@${{ secrets.EC2_HOST }}:/var/www/html/
+          scp -i ${{ secrets.EC2_PRIVATE_KEY }} -r dist ubuntu@${{ secrets.EC2_HOST }}:/var/www/html/
 
           # Clean up the private key file after use for security
-          rm -f private-key.pem
+          # rm -f private-key.pem
         
         
       # Install Backend Dependencies
