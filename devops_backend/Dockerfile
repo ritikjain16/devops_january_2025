@@ -1,11 +1,11 @@
 # Use Node.js base image
-FROM node:16
+FROM node:18
 
 # Set working directory
-WORKDIR /devops_backend
+WORKDIR /app
 
 # Copy package.json and install dependencies
-COPY package.json .
+COPY package.json package-lock.json ./
 RUN npm install
 
 # Copy the rest of the files
