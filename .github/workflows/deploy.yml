@@ -24,7 +24,7 @@ jobs:
           npm install
           npm run build
           ls dist
-          scp -i ${{ secrets.EC2_PRIVATE_KEY }} -r dist ec2-user@${{ secrets.EC2_HOST }}:../../var/www/html/
+          scp -i ${{ secrets.EC2_PRIVATE_KEY }} -r devops_frontend/dist ec2-user@${{ secrets.EC2_HOST }}:/var/www/html/
 
       # Install Backend Dependencies
       - name: Install Backend Dependencies
