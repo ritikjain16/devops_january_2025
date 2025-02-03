@@ -47,19 +47,19 @@ jobs:
     steps:
       - name: Copy Frontend to EC2
         run: |
-            ls -l
+            # ls -l
             # Create a temporary private key file
-            # echo "${{ secrets.EC2_PRIVATE_KEY }}" > private-key.pem
-            echo "${{ secrets.EC2_PRIVATE_KEY }}"
+            echo "${{ secrets.EC2_PRIVATE_KEY }}" > private-key.pem
+            # echo "${{ secrets.EC2_PRIVATE_KEY }}"
         
-            # # Set the correct permissions for the private key file
-            # chmod 600 private-key.pem
+            # Set the correct permissions for the private key file
+            chmod 600 private-key.pem
         
-            # # Run SCP command
-            # scp -i private-key.pem -r devops_frontend/dist ec2-user@${{ secrets.EC2_HOST }}:/var/www/html/
+            # Run SCP command
+            scp -i private-key.pem -r devops_frontend/dist ec2-user@${{ secrets.EC2_HOST }}:/var/www/html/
         
-            # # Clean up the temporary private key file
-            # rm -f private-key.pem
+            # Clean up the temporary private key file
+            rm -f private-key.pem
             
       - name: SSH into EC2 & Deploy Backend
         uses: appleboy/ssh-action@v0.1.10
