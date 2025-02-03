@@ -47,8 +47,6 @@ jobs:
       - name: Copy Frontend to EC2
         run: |
           scp -i ${{ secrets.EC2_PRIVATE_KEY }} -r devops_frontend/dist ec2-user@${{ secrets.EC2_HOST }}:/var/www/html/
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}  # Use the private key secret here
 
       - name: SSH into EC2 & Deploy Backend
         uses: appleboy/ssh-action@v0.1.10
