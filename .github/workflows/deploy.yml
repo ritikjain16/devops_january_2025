@@ -34,7 +34,8 @@ jobs:
 
           # Check if the private key was written correctly (debug step)
           cat private-key.pem
-          echo "Private Key File Exists: $(test -f private-key.pem && echo 'Yes' || echo 'No')"
+
+          echo "Private Key File Exists $(test -f private-key.pem && echo 'Yes' || echo 'No')"
           echo "Current Working Directory:"
           pwd
           echo "Listing files:"
