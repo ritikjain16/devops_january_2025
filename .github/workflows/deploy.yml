@@ -3,7 +3,7 @@ name: Deploy MERN App to AWS
 on:
   push:
     branches:
-      - master
+      - master  # Trigger on push to master branch (or the branch of your choice)
 
 jobs:
   build:
@@ -20,10 +20,9 @@ jobs:
       # Install and Build Frontend
       - name: Install & Build Frontend
         run: |
-          cd devops_frontend  # Ensure correct folder name
+          cd devops_frontend
           npm install
           npm run build
-          scp -i ${{ secrets.EC2_PRIVATE_KEY }} -r devops_frontend/dist ec2-user@${{ secrets.EC2_HOST }}:/var/www/html/
 
       # Install Backend Dependencies
       - name: Install Backend Dependencies
@@ -38,39 +37,37 @@ jobs:
       # Build & Push Docker Images (Frontend & Backend)
       - name: Build & Push Docker Images
         run: |
-          # docker build -t ${{ secrets.DOCKER_USERNAME }}/mern-frontend:latest ./devops_frontend
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/mern-backend:latest ./devops_backend
-          # docker push ${{ secrets.DOCKER_USERNAME }}/mern-frontend:latest
-          docker push ${{ secrets.DOCKER_USERNAME }}/mern-backend:latest
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/mern-backend ./devops_backend
+          docker push ${{ secrets.DOCKER_USERNAME }}/mern-backend
 
   deploy:
     runs-on: ubuntu-latest
     needs: build
     steps:
-      - name: SSH into EC2 & Deploy
+      - name: Copy Frontend to EC2
+        run: |
+          scp -i ${{ secrets.EC2_PRIVATE_KEY }} -r devops_frontend/dist ec2-user@${{ secrets.EC2_HOST }}:/var/www/html/
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}  # Use the private key secret here
+
+      - name: SSH into EC2 & Deploy Backend
         uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
+          username: ec2-user
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script: |
-            # Stop and remove existing containers
-            docker stop mern-frontend mern-backend || true
-            docker rm mern-frontend mern-backend || true
+            # Stop and remove existing backend container
+            docker stop mern-backend || true
+            docker rm mern-backend || true
 
-            # Pull latest images
-            # docker pull ${{ secrets.DOCKER_USERNAME }}/mern-frontend:latest
-            docker pull ${{ secrets.DOCKER_USERNAME }}/mern-backend:latest
+            # Pull the latest backend image
+            docker pull ${{ secrets.DOCKER_USERNAME }}/mern-backend
 
-            # Run backend with volume for persistent data
+            # Run the backend
             docker run -d -p 5000:5000 --name mern-backend \
-              -v backend_data:/app/uploads \
               -e MONGO_URI="${{ secrets.MONGO_URI }}" \
-              ${{ secrets.DOCKER_USERNAME }}/mern-backend:latest
+              ${{ secrets.DOCKER_USERNAME }}/mern-backend
 
-            # # Run frontend with Nginx serving Vite build
-            # docker run -d -p 80:80 --name mern-frontend \
-            #   ${{ secrets.DOCKER_USERNAME }}/mern-frontend:latest
-
-            # Cleanup unused Docker images
-            docker image prune -f
+            # Restart Nginx to serve the new frontend
+            sudo systemctl restart nginx
