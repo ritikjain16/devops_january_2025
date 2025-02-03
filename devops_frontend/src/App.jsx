@@ -19,7 +19,7 @@ const App = () => {
     checkBackend();
   }, []);
 
-  return <div>App - {data?.msg}</div>;
+  return <div>Appss - {data?.msg}</div>;
 };
 
 export default App;
