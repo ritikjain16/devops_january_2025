@@ -7,9 +7,9 @@ const App = () => {
 
   const checkBackend = async () => {
     try {
-      const res = await axios.get("http://13.233.126.92:5000");
+      const res = await axios.get(import.meta.env.VITE_API_URL);
       console.log(res.data);
-      setData(res.data)
+      setData(res.data);
     } catch (e) {
       console.log(e);
     }
