@@ -18,7 +18,7 @@ jobs:
           node-version: 18
 
       - name: Add EC2 Host to Known Hosts
-         run: |
+        run: |
           mkdir -p ~/.ssh
           ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
           chmod 600 ~/.ssh/known_hosts
