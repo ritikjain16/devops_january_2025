@@ -20,14 +20,14 @@ jobs:
       # Install and Build Frontend
       - name: Install & Build Frontend
         run: |
-          cd frontend  # Ensure correct folder name
+          cd devops_frontend  # Ensure correct folder name
           npm install
           npm run build
 
       # Install Backend Dependencies
       - name: Install Backend Dependencies
         run: |
-          cd backend
+          cd devops_backend
           npm install
 
       # Login to Docker Hub
