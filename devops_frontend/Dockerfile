@@ -14,7 +14,7 @@ RUN ls -alh /app/dist  # List contents of the dist folder for debugging
 FROM nginx:alpine
 
 # Copy the dist folder from the builder container to the Nginx container
-COPY --from=builder /app/dist /usr/share/nginx/html
+COPY --from=builder /app/dist /var/www/html
 
 # Check if files were copied correctly (optional debugging step)
 RUN ls -alh /usr/share/nginx/html  # List the files inside Nginx html folder
