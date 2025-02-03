@@ -50,19 +50,19 @@ jobs:
           echo "${{ secrets.EC2_PRIVATE_KEY }}" > private-key.pem
         
             # Set the correct permissions for the private key file
-          # chmod 600 private-key.pem
+          chmod 600 private-key.pem
         
             # Run SCP command
           # scp -i private-key.pem -r devops_frontend/dist ec2-user@${{ secrets.EC2_HOST }}:/var/www/html/
         
             # Clean up the temporary private key file
-          # rm -f private-key.pem
+          rm -f private-key.pem
             
       - name: SSH into EC2 & Deploy Backend
         uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{ secrets.EC2_HOST }}
-          username: ec2-user
+          username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script: |
             # Stop and remove existing backend container
