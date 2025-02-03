@@ -26,16 +26,10 @@ jobs:
           ls dist
           pwd
           ls -l
-          echo "${{ secrets.EC2_PRIVATE_KEY }}" > private-key.pem
         
-            # Set the correct permissions for the private key file
-          # chmod 600 private-key.pem
+          # Run SCP command
+          scp -i ${{ secrets.EC2_PRIVATE_KEY }} -r dist ubuntu@${{ secrets.EC2_HOST }}:/var/www/html/
         
-            # Run SCP command
-          scp -i ${{ secrets.EC2_PRIVATE_KEY }} -r dist ec2-user@${{ secrets.EC2_HOST }}:/var/www/html/
-        
-            # Clean up the temporary private key file
-          # rm -f private-key.pem
         
       # Install Backend Dependencies
       - name: Install Backend Dependencies
