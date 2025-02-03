@@ -26,25 +26,15 @@ jobs:
           ls dist
           pwd
           ls -l
-        # Write the private key from GitHub Secrets to a file
           echo "${{ secrets.EC2_PRIVATE_KEY }}" > private-key.pem
-
-          # Set the correct file permissions for the private key
           chmod 600 private-key.pem
-
-          # Check if the private key was written correctly (debug step)
           cat private-key.pem
-
           echo "Private Key File Exists $(test -f private-key.pem && echo 'Yes' || echo 'No')"
           echo "Current Working Directory:"
           pwd
           echo "Listing files:"
           ls -l
-
-          # Run SCP to copy the frontend files to EC2
           scp -i private-key.pem -r dist ubuntu@${{ secrets.EC2_HOST }}:/var/www/html/
-
-          # Clean up the private key file after use for security
           rm -f private-key.pem
 
       # Install Backend Dependencies
