@@ -20,14 +20,14 @@ jobs:
       # Install and Build Frontend
       - name: Install & Build Frontend
         run: |
-          cd devops_frontend
+          cd frontend  # Ensure correct folder name
           npm install
           npm run build
 
       # Install Backend Dependencies
       - name: Install Backend Dependencies
         run: |
-          cd devops_backend
+          cd backend
           npm install
 
       # Login to Docker Hub
@@ -37,10 +37,10 @@ jobs:
       # Build & Push Docker Images (Frontend & Backend)
       - name: Build & Push Docker Images
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/mern-frontend ./devops_frontend
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/mern-backend ./devops_backend
-          docker push ${{ secrets.DOCKER_USERNAME }}/mern-frontend
-          docker push ${{ secrets.DOCKER_USERNAME }}/mern-backend
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/mern-frontend:latest ./devops_frontend
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/mern-backend:latest ./devops_backend
+          docker push ${{ secrets.DOCKER_USERNAME }}/mern-frontend:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/mern-backend:latest
 
   deploy:
     runs-on: ubuntu-latest
@@ -58,14 +58,18 @@ jobs:
             docker rm mern-frontend mern-backend || true
 
             # Pull latest images
-            docker pull ${{ secrets.DOCKER_USERNAME }}/mern-frontend
-            docker pull ${{ secrets.DOCKER_USERNAME }}/mern-backend
+            docker pull ${{ secrets.DOCKER_USERNAME }}/mern-frontend:latest
+            docker pull ${{ secrets.DOCKER_USERNAME }}/mern-backend:latest
 
-            # Run backend
+            # Run backend with volume for persistent data
             docker run -d -p 5000:5000 --name mern-backend \
+              -v backend_data:/app/uploads \
               -e MONGO_URI="${{ secrets.MONGO_URI }}" \
-              ${{ secrets.DOCKER_USERNAME }}/mern-backend
+              ${{ secrets.DOCKER_USERNAME }}/mern-backend:latest
 
-            # Run frontend (serving with Nginx)
+            # Run frontend with Nginx serving Vite build
             docker run -d -p 80:80 --name mern-frontend \
-              ${{ secrets.DOCKER_USERNAME }}/mern-frontend
+              ${{ secrets.DOCKER_USERNAME }}/mern-frontend:latest
+
+            # Cleanup unused Docker images
+            docker image prune -f
