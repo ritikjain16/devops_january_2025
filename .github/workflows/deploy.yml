@@ -23,7 +23,7 @@ jobs:
           cd devops_frontend
           npm install
           npm run build
-          ls devops_frontend
+          ls -l
 
       # Install Backend Dependencies
       - name: Install Backend Dependencies
