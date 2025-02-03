@@ -37,8 +37,8 @@ jobs:
       # Build & Push Docker Images (Frontend & Backend)
       - name: Build & Push Docker Images
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/mern-frontend ./frontend
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/mern-backend ./backend
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/mern-frontend ./devops_frontend
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/mern-backend ./devops_backend
           docker push ${{ secrets.DOCKER_USERNAME }}/mern-frontend
           docker push ${{ secrets.DOCKER_USERNAME }}/mern-backend
 
