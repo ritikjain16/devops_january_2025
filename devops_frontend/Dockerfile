@@ -1,19 +1,23 @@
-# Step 1: Build the React app
+# Step 1: Build the React app using Vite
 FROM node:18-alpine AS builder
 
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm install
 COPY . .
-RUN npm run build  # Creates the dist folder
+RUN npm run build  # This should generate the dist folder
 
-# Step 2: Set up Nginx to serve the app
+# Check if dist folder is created (optional debugging step)
+RUN ls -alh /app/dist  # List contents of the dist folder for debugging
+
+# Step 2: Serve using Nginx
 FROM nginx:alpine
 
+# Copy the dist folder from the builder container to the Nginx container
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Expose port 80 for the frontend
-EXPOSE 80
+# Check if files were copied correctly (optional debugging step)
+RUN ls -alh /usr/share/nginx/html  # List the files inside Nginx html folder
 
-# Run Nginx in the foreground
+EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
