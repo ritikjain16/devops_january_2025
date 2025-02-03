@@ -23,7 +23,7 @@ jobs:
           cd devops_frontend
           npm install
           npm run build
-          ls -l
+          ls dist
 
       # Install Backend Dependencies
       - name: Install Backend Dependencies
@@ -47,8 +47,8 @@ jobs:
     steps:
       - name: Copy Frontend to EC2
         run: |
-          ls devops_frontend/dist
-          # scp -i ${{ secrets.EC2_PRIVATE_KEY }} -r devops_frontend/dist ec2-user@${{ secrets.EC2_HOST }}:/var/www/html/
+          ls dist
+          scp -i ${{ secrets.EC2_PRIVATE_KEY }} -r dist ec2-user@${{ secrets.EC2_HOST }}:/var/www/html/
 
       - name: SSH into EC2 & Deploy Backend
         uses: appleboy/ssh-action@v0.1.10
