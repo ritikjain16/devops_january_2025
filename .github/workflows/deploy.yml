@@ -20,7 +20,7 @@ jobs:
       # Set environment variables for Vite
       - name: Set Vite Environment Variables
         run: |
-          echo "VITE_API_URL=http://${{ secrets.EC2_HOST }}" >> .env
+          echo "VITE_API_URL=http://${{ secrets.EC2_HOST }}:5000" >> devops_frontend/.env
 
       - name: Add EC2 Host to Known Hosts
         run: |
