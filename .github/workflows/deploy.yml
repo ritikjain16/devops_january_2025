@@ -53,7 +53,7 @@ jobs:
           chmod 600 private-key.pem
         
             # Run SCP command
-          # scp -i private-key.pem -r devops_frontend/dist ec2-user@${{ secrets.EC2_HOST }}:/var/www/html/
+          scp -i private-key.pem -r devops_frontend/dist ec2-user@${{ secrets.EC2_HOST }}:/var/www/html/
         
             # Clean up the temporary private key file
           rm -f private-key.pem
