@@ -37,8 +37,9 @@ jobs:
       # Build & Push Docker Images (Frontend & Backend)
       - name: Build & Push Docker Images
         run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/mern-frontend ./devops_frontend
           docker build -t ${{ secrets.DOCKER_USERNAME }}/mern-backend ./devops_backend
-          
+          docker push ${{ secrets.DOCKER_USERNAME }}/mern-frontend
           docker push ${{ secrets.DOCKER_USERNAME }}/mern-backend
 
   deploy:
@@ -57,7 +58,7 @@ jobs:
             docker rm mern-frontend mern-backend || true
 
             # Pull latest images
-            
+            docker pull ${{ secrets.DOCKER_USERNAME }}/mern-frontend
             docker pull ${{ secrets.DOCKER_USERNAME }}/mern-backend
 
             # Run backend
@@ -65,4 +66,6 @@ jobs:
               -e MONGO_URI="${{ secrets.MONGO_URI }}" \
               ${{ secrets.DOCKER_USERNAME }}/mern-backend
 
-            
+            # Run frontend (serving with Nginx)
+            docker run -d -p 80:80 --name mern-frontend \
+              ${{ secrets.DOCKER_USERNAME }}/mern-frontend
