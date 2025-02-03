@@ -46,6 +46,7 @@ jobs:
     steps:
       - name: Copy Frontend to EC2
         run: |
+          ls devops_frontend/dist
           scp -i ${{ secrets.EC2_PRIVATE_KEY }} -r devops_frontend/dist ec2-user@${{ secrets.EC2_HOST }}:/var/www/html/
 
       - name: SSH into EC2 & Deploy Backend
