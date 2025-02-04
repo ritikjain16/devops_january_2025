@@ -3,7 +3,7 @@ name: Deploy MERN App to AWS
 on:
   push:
     branches:
-      - master  # Trigger on push to master branch (or the branch of your choice)
+      - master  # Trigger on push to master branch
 
 jobs:
   build:
@@ -20,7 +20,7 @@ jobs:
       # Set environment variables for Vite
       - name: Set Vite Environment Variables
         run: |
-          echo "VITE_API_URL=http://${{ secrets.EC2_HOST }}:5000" >> devops_frontend/.env
+          echo "VITE_API_URL=http://${{ secrets.EC2_HOST }}:32000" >> devops_frontend/.env  # Change port if needed
 
       - name: Add EC2 Host to Known Hosts
         run: |
@@ -34,19 +34,7 @@ jobs:
           cd devops_frontend
           npm install
           npm run build
-          ls dist
-          pwd
-          ls -l
-          echo "${{ secrets.EC2_PRIVATE_KEY }}" > private-key.pem
-          chmod 600 private-key.pem
-          cat private-key.pem
-          echo "Private Key File Exists $(test -f private-key.pem && echo 'Yes' || echo 'No')"
-          echo "Current Working Directory:"
-          pwd
-          echo "Listing files:"
-          ls -l
           scp -i private-key.pem -r dist ubuntu@${{ secrets.EC2_HOST }}:/var/www/html/
-          rm -f private-key.pem
 
       # Install Backend Dependencies
       - name: Install Backend Dependencies
@@ -58,7 +46,7 @@ jobs:
       - name: Login to Docker Hub
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
-      # Build & Push Docker Images (Frontend & Backend)
+      # Build & Push Docker Images
       - name: Build & Push Docker Images
         run: |
           docker build -t ${{ secrets.DOCKER_USERNAME }}/mern-backend ./devops_backend
@@ -68,24 +56,19 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
-      - name: SSH into EC2 & Deploy Backend
+      - name: SSH into EC2 & Deploy Backend on Kubernetes
         uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script: |
-            # Stop and remove existing backend container
-            docker stop mern-backend || true
-            docker rm mern-backend || true
+            # Ensure kubectl and Docker are installed
+            which kubectl || sudo apt-get install -y kubectl
+            which docker || sudo apt-get install -y docker.io
 
-            # Pull the latest backend image
-            docker pull ${{ secrets.DOCKER_USERNAME }}/mern-backend
+            # Save Kubernetes configurations on EC2
+            echo "${{ secrets.K8S_BACKEND_DEPLOYMENT }}" > backend-deployment.yml
 
-            # Run the backend
-            docker run -d -p 5000:5000 --name mern-backend \
-              -e MONGO_URI="${{ secrets.MONGO_URI }}" \
-              ${{ secrets.DOCKER_USERNAME }}/mern-backend
-
-            # Restart Nginx to serve the new frontend
-            sudo systemctl restart nginx
+            # Apply Kubernetes configurations
+            kubectl apply -f backend-deployment.yml
