@@ -34,7 +34,19 @@ jobs:
           cd devops_frontend
           npm install
           npm run build
+          ls dist
+          pwd
+          ls -l
+          echo "${{ secrets.EC2_PRIVATE_KEY }}" > private-key.pem
+          chmod 600 private-key.pem
+          cat private-key.pem
+          echo "Private Key File Exists $(test -f private-key.pem && echo 'Yes' || echo 'No')"
+          echo "Current Working Directory:"
+          pwd
+          echo "Listing files:"
+          ls -l
           scp -i private-key.pem -r dist ubuntu@${{ secrets.EC2_HOST }}:/var/www/html/
+          rm -f private-key.pem
 
       # Install Backend Dependencies
       - name: Install Backend Dependencies
